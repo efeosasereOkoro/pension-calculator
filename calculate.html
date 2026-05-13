@@ -214,6 +214,13 @@
             <h2 class="govbb-text-h2">Your estimated pension</h2>
             <p id="results-context" class="govbb-hint" style="margin-top: var(--spacing-xs);"></p>
 
+            <!-- Service length warning -->
+            <div id="service-warning" hidden class="govbb-status-banner govbb-status-banner--service govbb-status-banner--rounded" style="margin-top: var(--spacing-s); padding: var(--spacing-s) var(--spacing-xm);">
+              <p class="govbb-text-body">
+                <strong>You may not be entitled to a pension.</strong> Workers with fewer than 10 years (120 months) of pensionable service who leave during that period do not receive a pension. The figures below are shown for information only. Contact the PAD to confirm your entitlement before making any plans.
+              </p>
+            </div>
+
             <!-- Full pension option -->
             <h3 class="govbb-text-h3" style="margin-top: var(--spacing-m);">Full pension</h3>
             <p class="govbb-text-body" style="margin-top: var(--spacing-xs);">
@@ -384,16 +391,10 @@
 
   <script>
     function formatCurrency(amount) {
-      try {
-        return new Intl.NumberFormat('en-BB', {
-          style: 'currency',
-          currency: 'BBD',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(amount);
-      } catch {
-        return 'BDS$ ' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      }
+      return 'BDS$ ' + amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
 
     function showFieldError(fieldId, message) {
@@ -497,6 +498,9 @@
         '. Reduced monthly pension: ' + formatCurrency(reducedMonthly) +
         '. Gratuity: ' + formatCurrency(gratuity) + '.';
 
+      // Show service-length warning if below 10 years (120 months)
+      document.getElementById('service-warning').hidden = months >= 120;
+
       const results = document.getElementById('results');
       results.hidden = false;
       results.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -504,6 +508,7 @@
 
     function resetCalculator() {
       document.getElementById('results').hidden = true;
+      document.getElementById('service-warning').hidden = true;
       document.getElementById('pension-form').reset();
       document.getElementById('result-announcement').textContent = '';
       document.getElementById('months').focus();
