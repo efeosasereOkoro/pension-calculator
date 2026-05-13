@@ -214,31 +214,55 @@
             <h2 class="govbb-text-h2">Your estimated pension</h2>
             <p id="results-context" class="govbb-hint" style="margin-top: var(--spacing-xs);"></p>
 
+            <!-- Service length warning -->
+            <div id="service-warning" hidden class="govbb-status-banner govbb-status-banner--service govbb-status-banner--rounded" style="margin-top: var(--spacing-s); padding: var(--spacing-s) var(--spacing-xm);">
+              <p class="govbb-text-body">
+                <strong>You may not be entitled to a pension.</strong> Workers with fewer than 10 years (120 months) of pensionable service who leave during that period do not receive a pension. The figures below are shown for information only. Contact the PAD to confirm your entitlement before making any plans.
+              </p>
+            </div>
+
+            <!-- Full pension option -->
+            <h3 class="govbb-text-h3" style="margin-top: var(--spacing-m);">Full pension</h3>
+            <p class="govbb-text-body" style="margin-top: var(--spacing-xs);">
+              You receive your full pension amount divided by 12 and paid monthly, plus a gratuity lump sum. Choose this if you want the highest possible monthly income in retirement.
+            </p>
             <div class="pension-results__grid">
               <div class="result-card">
-                <p class="result-card__label govbb-text-caption">Full annual pension</p>
+                <p class="result-card__label govbb-text-caption">Annual amount</p>
                 <p class="result-card__value govbb-text-h3" id="result-full-annual">—</p>
               </div>
               <div class="result-card">
-                <p class="result-card__label govbb-text-caption">Full monthly pension</p>
+                <p class="result-card__label govbb-text-caption">Monthly payment</p>
                 <p class="result-card__value govbb-text-h3" id="result-full-monthly">—</p>
               </div>
+            </div>
+
+            <!-- Reduced pension option -->
+            <h3 class="govbb-text-h3" style="margin-top: var(--spacing-m);">Reduced pension</h3>
+            <p class="govbb-text-body" style="margin-top: var(--spacing-xs);">
+              You receive 75% of your full pension paid monthly. The remaining 25% is converted into a larger gratuity lump sum paid upfront. This may suit you if you want more money at the start of retirement — for example, to pay off a mortgage or cover immediate costs — and can manage on a lower monthly income.
+            </p>
+            <div class="pension-results__grid">
               <div class="result-card">
-                <p class="result-card__label govbb-text-caption">Reduced annual pension (75%)</p>
+                <p class="result-card__label govbb-text-caption">Annual amount</p>
                 <p class="result-card__value govbb-text-h3" id="result-reduced-annual">—</p>
               </div>
               <div class="result-card">
-                <p class="result-card__label govbb-text-caption">Reduced monthly pension</p>
+                <p class="result-card__label govbb-text-caption">Monthly payment</p>
                 <p class="result-card__value govbb-text-h3" id="result-reduced-monthly">—</p>
               </div>
+            </div>
+
+            <!-- Gratuity -->
+            <div class="pension-results__grid" style="margin-top: var(--spacing-m);">
               <div class="result-card result-card--gratuity" style="grid-column: 1 / -1;">
                 <p class="result-card__label govbb-text-caption">Gratuity (lump sum)</p>
                 <p class="result-card__value govbb-text-h3" id="result-gratuity">—</p>
               </div>
             </div>
 
-            <p class="govbb-hint govbb-text-caption" style="margin-top: var(--spacing-m);">
-              The gratuity shown applies to both the full and reduced pension disbursement options.
+            <p class="govbb-hint govbb-text-caption" style="margin-top: var(--spacing-s);">
+              These figures are estimates only. Contact the PAD to discuss which option suits your circumstances before you retire.
             </p>
 
             <div class="govbb-btn-group" style="margin-top: var(--spacing-s);">
@@ -316,6 +340,25 @@
             </div>
           </div>
 
+          <!-- Next steps -->
+          <div style="border-top: 2px solid var(--color-grey-00); padding-top: var(--spacing-m); margin-top: var(--spacing-l);">
+            <h2 class="govbb-text-h2">Next steps</h2>
+            <p class="govbb-text-body" style="margin-top: var(--spacing-s);">
+              Once you have your estimate, contact the National Insurance and Social Security Service (NIS) to discuss your pension options and confirm your entitlement.
+            </p>
+
+            <h3 class="govbb-text-h3" style="margin-top: var(--spacing-m);">National Insurance and Social Security Service (NIS) — Pensions</h3>
+            <p class="govbb-text-body" style="margin-top: var(--spacing-xs);">
+              NIS can help you understand your National Insurance pension entitlement alongside any government pension. If you qualify for both, you will receive only the higher of the two.
+            </p>
+            <ul class="govbb-list govbb-list--bullet" style="margin-top: var(--spacing-xs);">
+              <li>
+                Phone: <a class="govbb-link" href="tel:+12464317400">431-7400</a>
+                — Ext. 1802, 1803, 1808 or 1824
+              </li>
+            </ul>
+          </div>
+
           <!-- Sources -->
           <div style="border-top: 2px solid var(--color-grey-00); padding-top: var(--spacing-m); margin-top: var(--spacing-l);">
             <h2 class="govbb-text-h2">Sources</h2>
@@ -367,16 +410,10 @@
 
   <script>
     function formatCurrency(amount) {
-      try {
-        return new Intl.NumberFormat('en-BB', {
-          style: 'currency',
-          currency: 'BBD',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(amount);
-      } catch {
-        return 'BDS$ ' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      }
+      return 'BDS$ ' + amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
 
     function showFieldError(fieldId, message) {
@@ -480,6 +517,9 @@
         '. Reduced monthly pension: ' + formatCurrency(reducedMonthly) +
         '. Gratuity: ' + formatCurrency(gratuity) + '.';
 
+      // Show service-length warning if below 10 years (120 months)
+      document.getElementById('service-warning').hidden = months >= 120;
+
       const results = document.getElementById('results');
       results.hidden = false;
       results.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -487,6 +527,7 @@
 
     function resetCalculator() {
       document.getElementById('results').hidden = true;
+      document.getElementById('service-warning').hidden = true;
       document.getElementById('pension-form').reset();
       document.getElementById('result-announcement').textContent = '';
       document.getElementById('months').focus();
